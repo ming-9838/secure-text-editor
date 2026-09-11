@@ -1,0 +1,251 @@
+Secure Text Editor – User Guide & Features
+Version 3.0
+________________________________________
+Overview
+Secure Text Editor is a lightweight, offline, privacy-first text editor that stores your documents in encrypted form on disk. Unlike cloud-based editors or standard notepad applications, it protects your content even if someone knows the file path — encrypted documents cannot be read without your master password.
+This version introduces file-level AES encryption (.stxt format), giving you a true security boundary between plain text and protected content.
+________________________________________
+What's New in Version 3.0
+•	🔐 File-Level Encryption – Documents saved as .stxt are AES-encrypted on disk; the raw file contents are unreadable without the master password.
+•	📄 Two Save Formats – Choose between .stxt (encrypted) and .txt (plain) per file.
+•	🔑 Master Encryption Password – One password protects all your encrypted files.
+•	🛡️ Header-Based Auto-Detection – Encrypted files carry a STXT-ENC-V1: header; the editor recognizes them automatically when opened.
+•	🔒 Overhead Transparency – The status bar shows whether the current document is Plain or Encrypted at all times.
+Retained from v2.0:
+•	Persistent lock password (one-key locking, no more temporary passwords)
+•	Full-screen lock overlay that hides content
+•	Global keyboard shortcuts across the entire window
+•	Recent files with timestamps
+•	Auto-save and auto-backup running even while locked
+________________________________________
+Key Features
+File-Level Encryption (New)
+•	.stxt Format – Encrypted documents use a custom .stxt extension.
+•	AES-128-CBC + HMAC-SHA256 (Fernet) with PBKDF2-HMAC-SHA256 key derivation, 100,000 iterations, 16-byte random salt per file.
+•	Per-File Salt – Even identical content produces different ciphertext across files.
+•	Auto-Detection – The editor reads the file header and knows whether to prompt for a password.
+•	Plain .txt Compatibility – You can still open and save standard plain text files; you choose the format when saving a new file.
+•	Save As Menu – Explicitly save the current buffer as .stxt or .txt at any time.
+Privacy & Security
+•	100% Offline – No cloud sync, no telemetry, no internet connection required.
+•	Encrypted History – Recent file paths and timestamps are AES-encrypted before being written to disk.
+•	Encrypted License File – Registration details stored with AES encryption.
+•	Encrypted Lock Password – Stored as a PBKDF2-HMAC-SHA256 hash (100k iterations, 16-byte salt), then AES-encrypted on disk.
+•	Encrypted Master Password Verification – A verify token is stored encrypted; the master password is never written to disk in plain form.
+•	Secure Delete – Document content is overwritten in memory before release.
+•	Audit Log – All significant events are logged locally (open, save, lock, unlock, backup, replace, master password changes).
+Lock & Unlock
+•	Persistent Lock Password – Set once, reuse forever. No repeated setup.
+•	One-Key Lock – Press Ctrl+L or click Lock → locks instantly.
+•	Full-Screen Overlay – Dark overlay completely hides document content.
+•	Auto-Lock on Idle – Locks automatically after a configurable period of inactivity.
+•	Change / Clear Password – Manage anytime from the Protection menu.
+•	Read-Only Mode – Ctrl+R for view-only access.
+Editor
+•	Multi-Document Interface – Left sidebar lists all open documents with modified indicators (*).
+•	Recent Files with Timestamps – Last 10 files with their last-access time, persisted across sessions.
+•	Find & Replace – Highlight search, find next/previous, replace one or all.
+•	Word Wrap Toggle – Auto-wrap long lines or horizontal scroll.
+•	Full Undo/Redo – Multi-level undo history.
+•	Right-Click Context Menu – Cut, copy, paste, find, replace, backup, and Save As.
+•	UTF-8 / GBK Encoding Support – Reads legacy encodings automatically.
+Backup System
+•	Auto-Backup – Silent backup every 60 seconds (configurable).
+•	Manual Backup – One-click from sidebar or menu.
+•	Version History – Keeps the last 10 backups per file; older versions auto-cleaned.
+•	Restore Any Version – One click from the backup viewer.
+•	Backup Runs While Locked – Data protection never stops.
+•	Encrypted Files – Encrypted (.stxt) content is not backed up to prevent plaintext leakage; only the ciphertext on disk is authoritative.
+Data Management
+•	Custom Data Directory – Choose where config, history, and backups are stored; migrate existing data with one click.
+•	Clear Sensitive Data – Wipes history, clipboard, undo buffer, and forces garbage collection.
+•	File Size Limits – Prevent memory exhaustion (50 MB default, up to 2× for encrypted files due to base64 overhead).
+•	Document Limit – Cap on simultaneous open documents (default 100).
+Licensing
+•	One-Machine-One-Code – Each license is bound to a unique hardware fingerprint.
+•	Machine Code Auto-Generation – Copy and send; no manual entry required.
+•	Encrypted Local Storage – License data AES-encrypted on disk.
+•	Auto-Revalidation – Verified on each startup; invalid licenses are removed automatically.
+________________________________________
+File Formats
+Format	Extension	Encryption	Opened By	Use Case
+Plain text	.txt	None	Any text editor	Sharing, interoperability
+Encrypted	.stxt	AES-128 + PBKDF2 (100k)	Secure Text Editor only	Private notes, sensitive data
+.stxt File Structure
+text
+STXT-ENC-V1:<base64-salt>:<fernet-token>
+•	Header STXT-ENC-V1: – Identifies the format for auto-detection.
+•	Salt – 16 random bytes, base64-encoded, unique per save.
+•	Token – Fernet-encrypted ciphertext (AES-128-CBC + HMAC-SHA256).
+Overhead
+•	File size increases by ~33% due to base64 encoding.
+•	A 50 MB document becomes ~66 MB on disk.
+•	Memory peak during encrypt/decrypt: ~3× content size (50 MB → 150 MB).
+________________________________________
+Who Is It For?
+1. Privacy-Conscious Individuals
+Keep personal journals, passwords, and private notes fully offline and encrypted on disk. Even if someone copies the file or steals your USB drive, they cannot read the contents without the master password. The lock overlay protects against shoulder-surfing when stepping away.
+Why it fits: File-level encryption, one-key lock, fully offline.
+2. Legal, Medical, and Financial Professionals
+Handle confidential client information in a compliant manner. .stxt files provide encryption at rest, an audit trail records all actions, and read-only modes protect against accidental modification. Meets common confidentiality obligations (HIPAA, GDPR, attorney-client privilege).
+Why it fits: Encryption at rest, audit trail, machine-bound licensing.
+3. Writers, Authors, and Content Creators
+Protect unpublished manuscripts from leaks. Encrypted storage ensures that a stolen laptop or synced folder cannot expose your drafts. Version history and automatic backups guard against accidental deletions.
+Why it fits: Manuscript protection, version history, offline.
+4. Programmers and Developers
+A fast, lightweight alternative to bloated IDEs for code snippets, API keys, and credentials you'd rather not paste into a browser. Save as .stxt for secrets; .txt for everything else.
+Why it fits: Encrypted storage for secrets, global shortcuts, offline.
+5. Students and Researchers
+Store thesis drafts, research data, and study notes securely on your own computer. Backups guard against loss; the audit log tracks changes.
+Why it fits: Encryption, backup system, affordable one-time purchase.
+6. Small Businesses and Teams
+Equip staff with a secure offline editor for internal documents. Batch licensing and machine binding prevent sharing. Custom data directory supports shared network drives. Audit logs provide usage visibility.
+Why it fits: Batch licensing, audit trail, network-friendly.
+________________________________________
+Getting Started
+Registration (First Launch)
+1.	Launch the application. A registration window appears automatically.
+2.	Your machine code is generated and displayed. Click Copy.
+3.	Send your email address and machine code to the software author.
+4.	You will receive a 16-character license code.
+5.	Enter your email and license code → click Register.
+6.	Verification succeeds → the main editor opens. No further registration on this machine.
+Set Master Encryption Password (Required for .stxt)
+1.	Menu: 🛡️ Protection → Set Master Encryption Password
+2.	If a master password already exists, enter the current one.
+3.	Enter and confirm the new master password (minimum 4 characters).
+4.	The verify token is stored encrypted; the password is cached in memory for this session.
+⚠️ Warning: If you forget the master password, encrypted files cannot be recovered. Back up the password in a secure location.
+First Lock Password Setup
+1.	Press Ctrl+L (or click 🔒 Lock) for the first time.
+2.	Dialog appears: Set Lock Password.
+3.	Enter and confirm a password (minimum 3 characters).
+4.	When asked "Save this password permanently?":
+o	Yes → stored encrypted; future locks require no setup.
+o	No → valid only for this session.
+5.	The editor locks immediately with a full-screen overlay.
+Subsequent Locks
+•	Press Ctrl+L → editor locks instantly. No prompts.
+Unlocking
+•	Enter your saved password in the overlay → press Enter or click Unlock.
+•	Incorrect attempts show an inline error.
+________________________________________
+Using the Editor
+Basic Operations
+Action	Shortcut	Menu
+New Document	Ctrl+N	File → New
+Open File	Ctrl+O	File → Open
+Save	Ctrl+S	File → Save
+Save As Encrypted	—	File → Save As Encrypted
+Save As Plain	—	File → Save As Plain
+Lock Editor	Ctrl+L	Protection → Lock/Unlock
+Read-Only	Ctrl+R	Protection → Read-only Mode
+Find	Ctrl+F	Edit → Find
+Replace	Ctrl+H	Edit → Replace
+Note: Shortcuts work anywhere in the application window.
+Saving a New Document
+1.	Press Ctrl+S.
+2.	A dialog asks: "Save as ENCRYPTED (.stxt)?"
+o	Yes → choose filename; saved as .stxt (requires master password).
+o	No → choose filename; saved as .txt (plain text).
+o	Cancel → abort.
+Opening a Document
+•	Plain .txt → opens normally.
+•	Encrypted .stxt → prompts for the master password; content is decrypted into memory.
+Encrypted Indicator
+The top-right of the editor shows:
+•	📄 Plain (.txt) – file will be saved in plain text.
+•	🔒 Encrypted (.stxt) – file will be encrypted on save.
+Find & Replace
+•	Find Next / Previous cycles through matches with yellow highlighting.
+•	Replace replaces the current match; Replace All replaces every occurrence and reports the count.
+Backup & Restore
+•	Manual Backup – Sidebar → 💾 Backup, or File → Backup.
+•	View Backups – Sidebar → ↩️ Restore.
+•	Restore – Select a version and click Restore Selected.
+Recent Files
+•	The left sidebar shows the last 10 files with their last-opened timestamp.
+•	Encrypted files are marked with 🔒.
+•	Double-click an entry to open it.
+Advanced Settings
+Access via ⚙️ Config. Configure:
+•	Data directory (with migration)
+•	Word wrap default
+•	Auto-backup interval and version limit
+•	Auto-save toggle
+•	Auto-lock idle timeout
+•	Confirmation before save
+•	File size and document limits
+•	History entry limit
+________________________________________
+Lock Password Management
+Action	How
+Set (first time)	Ctrl+L → enter & confirm → choose Save
+Lock (after saved)	Ctrl+L – locks instantly
+Unlock	Enter password in overlay
+Change	Protection → Change Lock Password
+Clear	Protection → Clear Lock Password
+Security Notes
+•	Password hash uses PBKDF2-HMAC-SHA256 (100k iterations, 16-byte salt).
+•	Stored AES-encrypted in lock_password.json in the data directory.
+•	If forgotten, delete the file to reset.
+________________________________________
+Master Encryption Password Management
+Action	Menu
+Set / Change	Protection → Set Master Encryption Password
+Clear Cache	Protection → Clear Master Password Cache
+Behavior
+•	On first .stxt operation, you will be prompted for the password.
+•	Once entered, it's cached for the session to avoid repeated prompts.
+•	Clear Cache removes it from memory; next .stxt operation will prompt again.
+•	Verify token stored encrypted in master_verify.dat.
+Security Notes
+•	Master password never stored in plaintext.
+•	Key derivation: PBKDF2-HMAC-SHA256, 100,000 iterations, 16-byte per-file salt.
+•	If forgotten, encrypted files cannot be recovered.
+________________________________________
+Audit Log
+Every important event is recorded with a timestamp:
+•	APP_START, APP_CLOSE
+•	EDITOR_LOCKED, EDITOR_UNLOCKED
+•	LOCK_PW_SAVED, LOCK_PW_CHANGED, LOCK_PW_CLEARED
+•	MASTER_PW_SET, MASTER_CACHE_CLEARED
+•	FILE_OPENED, FILE_SAVED, FILE_SAVED_ENC, FILE_SAVED_PLAIN
+•	BACKUP_CREATED, BACKUP_RESTORED
+•	REPLACE_ALL, DATA_CLEARED
+View via 🔒 Security → View Audit Log.
+________________________________________
+System Requirements
+•	OS: Windows 10 / 11 (64-bit recommended)
+•	Disk Space: ~50 MB for the executable
+________________________________________________________________________________
+Licensing & Machine Binding
+•	One-Machine-One-Code – Each license bound to a unique hardware fingerprint.
+•	Machine Code derived from MAC address, hostname, and disk serial (SHA-256, 16 hex chars).
+•	License Code derived from email + machine_code via HMAC-SHA256.
+•	Encrypted Local Storage – License file encrypted on disk.
+•	Transfer – Contact author with the new machine code to obtain a new license.
+________________________________________
+Frequently Asked Questions
+Q: What happens if I lose my master password?
+A: Encrypted files cannot be decrypted. Plain .txt files remain accessible. Always back up the master password in a secure location.
+Q: Can someone read my .stxt file if they know the path?
+A: No. The file contains only an encrypted blob; without the master password, the content is unreadable.
+Q: Can I open .stxt files in other editors?
+A: No — only Secure Text Editor can decrypt them. This is by design.
+Q: Does auto-backup leak plaintext?
+A: Encrypted (.stxt) files are not backed up as plaintext. Only plain .txt files get plaintext backups.
+Q: Can I use the same license on two computers?
+A: No. Each license is bound to a machine code.
+Q: What if I switch computers?
+A: Contact the author with the new machine code to receive a new license.
+Q: Does the editor sync to the cloud?
+A: No. It never connects to the internet.
+Q: Can I still use plain .txt files?
+A: Yes — choose No at the save prompt, or use Save As Plain.
+________________________________________
+Support
+For license requests, bug reports, or feature suggestions, contact the author with your email and machine code.
+________________________________________
+Secure Text Editor – Your words. Your machine. Your privacy.
+
